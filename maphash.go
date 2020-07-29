@@ -16,9 +16,11 @@ type Hash struct {
 func (h *Hash) Sum64(key string) uint64 {
 	h.once.Do(h.initHash)
 	item := h.pool.Get().(*maphash.Hash)
-	defer h.pool.Put(item)
 	item.WriteString(key)
-	return item.Sum64()
+	res := item.Sum64()
+	item.Reset()
+	h.pool.Put(item)
+	return res
 }
 
 func (h *Hash) initHash() {
